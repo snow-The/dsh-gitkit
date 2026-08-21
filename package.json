@@ -1,0 +1,35 @@
+{
+  "name": "@snow-the/dsh-gitkit",
+  "version": "0.1.0",
+  "description": "Structured Git tools for DeepSeek Harness: status / diff / log / commit / branch with path validation and shell-free exec (own-built, replacing third-party git plugins).",
+  "type": "module",
+  "main": "./dist/index.js",
+  "license": "MIT",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "git",
+    "deepseek-harness"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test test/"
+  },
+  "files": [
+    "dist",
+    "cordis.patch.yml",
+    "LICENSE",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/snow-The/dsh-own-plugins.git",
+    "directory": "dsh-gitkit"
+  },
+  "types": "./dist/index.d.ts"
+}
