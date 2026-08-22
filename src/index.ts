@@ -11,6 +11,7 @@
  */
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
+import { Hono } from 'hono'
 
 const execFileP = promisify(execFile)
 
@@ -266,4 +267,23 @@ export function apply(ctx: Ctx): void {
       console.error(`[gitkit] ${tool.name} registration skipped: ${err}`)
     }
   }
+
+  // Hono app: try to mount on the host http service when available.
+  try {
+    const http = (ctx as unknown as { http?: { mount?: (p: string, f: unknown) => void } }).http
+    if (http?.mount) http.mount('/gitkit', createHonoApp(ctx).fetch)
+  } catch { /* no host http service */ }
+}
+
+// --- Hono app factory (health + metadata endpoints; same pattern as dsh-codex) ---
+
+export interface AppEnv {
+  Bindings: { ctx: unknown }
+}
+
+export function createHonoApp(_ctx: unknown): Hono<AppEnv> {
+  const app = new Hono<AppEnv>()
+  app.get('/api/gitkit/health', (c) => c.json({ ok: true, plugin: 'dsh-gitkit', ts: true, hono: true }))
+  app.get('/api/gitkit/version', (c) => c.json({ name: '@snow-the/dsh-gitkit', version: '0.1.0' }))
+  return app
 }

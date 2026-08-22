@@ -11,6 +11,7 @@
  */
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { Hono } from 'hono';
 const execFileP = promisify(execFile);
 export const name = 'gitkit';
 export const inject = ['tools'];
@@ -241,4 +242,17 @@ export function apply(ctx) {
             console.error(`[gitkit] ${tool.name} registration skipped: ${err}`);
         }
     }
+    // Hono app: try to mount on the host http service when available.
+    try {
+        const http = ctx.http;
+        if (http?.mount)
+            http.mount('/gitkit', createHonoApp(ctx).fetch);
+    }
+    catch { /* no host http service */ }
+}
+export function createHonoApp(_ctx) {
+    const app = new Hono();
+    app.get('/api/gitkit/health', (c) => c.json({ ok: true, plugin: 'dsh-gitkit', ts: true, hono: true }));
+    app.get('/api/gitkit/version', (c) => c.json({ name: '@snow-the/dsh-gitkit', version: '0.1.0' }));
+    return app;
 }
