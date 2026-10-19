@@ -280,7 +280,7 @@ export function apply(ctx: Ctx): void {
     try {
       ctx.tools.register(tool)
     } catch (err) {
-      console.error(`[gitkit] ${tool.name} registration skipped: ${err}`)
+      console.error(`[dsh-gitkit] ${tool.name} registration skipped: ${err}`)
     }
   }
 
